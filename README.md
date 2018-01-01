@@ -6,11 +6,10 @@ Website: https://coingate.com
 
 # Code Examples
 <ul>
-<li>RebyRuby Gem</li>
-<li>Coingate PHP</li>
-<li>Omnipay (PHP)</li>
-<li>Ruby on Rails Shop Example / Source Code</li>
-<li>E-commerce Plugins</li>
+  <li><a href="https://rubygems.org/gems/coingate">RebyRuby Gem</a></li>
+<li><a href="https://github.com/coingate/coingate-php">Coingate PHP</a></li>
+<li><a href="https://github.com/thephpleague/omnipay">Omnipay (PHP)</a></li>
+ <li><a href="https://coingate.com/plugins">E-commerce Plugins</a></li>
 </ul>
 
 
