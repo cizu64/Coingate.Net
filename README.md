@@ -1,6 +1,6 @@
 
 # Coingate.Net
-A library used to process coingate payment transactions in .Net
+A library used to <a href="http://techcerberus.blogspot.com/2017/12/coingate-in-net.html">accept payment in Bitcoin</a> in .Net
 
 Website: https://coingate.com
 
