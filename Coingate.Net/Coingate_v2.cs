@@ -10,9 +10,8 @@ namespace Coingate.Net
 {
     public class Coingate
     {
-        public string ApiKey, ApiSecret, AppId;
+        public string ApiToken;
         private readonly HttpClient _client;
-        private readonly int _nonce;
         private readonly string _baseUri;
 
         /// <summary>
@@ -22,52 +21,20 @@ namespace Coingate.Net
         /// <param name="apiSecret">The api secret</param>
         /// <param name="appId">The app id</param>
         /// <param name="useSandbox">True:use sandbox</param>
-        public Coingate(string apiKey, string apiSecret, string appId, bool useSandbox = true)
+        public Coingate(string apiToken, bool useSandbox = true)
         {
-            ApiKey = apiKey;
-            ApiSecret = apiSecret;
-            AppId = appId;
+            ApiToken = apiToken;
             _baseUri = useSandbox ? "https://api-sandbox.coingate.com/" : "https://api.coingate.com/";
-            _nonce = DateTime.Now.Second;
             _client = new HttpClient();
         }
-
-        /// <summary>
-        /// Generate signature 
-        /// </summary>
-        /// <param name="key">The api secret key</param>
-        /// <param name="message">The signature formed by adding the nonce,appKd and apiKey</param>
-        /// <returns></returns>
-        private string ConfigureHmac(string key, string message)
-        {
-            var encoding = Encoding.UTF8;
-            var keyByte = encoding.GetBytes(key);
-            var hmac = new HMACSHA256(keyByte);
-            var hash = hmac.ComputeHash(encoding.GetBytes(message));
-            var sb = new StringBuilder(hash.Length);
-            foreach (var character in hash)
-            {
-                sb.Append(character.ToString("x2"));
-            }
-            return sb.ToString();
-        }
-
-        private string Signature()
-        {
-            var message = _nonce + AppId + ApiKey;
-            var signature = ConfigureHmac(ApiSecret, message);
-            return signature;
-        }
-
+     
         /// <summary>
         /// Add the required headers needed for coingate auth
         /// </summary>
         /// <param name="signature"></param>
-        private void ConfigureHeaders(string signature)
+        private void ConfigureHeaders()
         {
-            _client.DefaultRequestHeaders.Add("Access-Key", ApiKey);
-            _client.DefaultRequestHeaders.Add("Access-Nonce", _nonce.ToString());
-            _client.DefaultRequestHeaders.Add("Access-Signature", signature);
+            _client.DefaultRequestHeaders.Add("Authorization", "Token " + ApiToken);      
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -82,7 +49,7 @@ namespace Coingate.Net
         public async Task<dynamic> GetOrders(string resourcePath = "/v2/orders/", int pageNo = 1, int pageSize = 10, string sort = "created_at_desc")
         {
             _client.BaseAddress = new Uri(_baseUri);
-             ConfigureHeaders(Signature());
+             ConfigureHeaders();
             string url = resourcePath + "?per_page=" + pageNo + "&page=" + pageSize + "&sort=" + sort;
             var response = await _client.GetAsync(url);
             if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
@@ -99,7 +66,7 @@ namespace Coingate.Net
         public async Task<dynamic> GetOrder(int orderId, string resourcePath = "/v2/orders/")
         {
             _client.BaseAddress = new Uri(_baseUri);
-            ConfigureHeaders(Signature());
+            ConfigureHeaders();
             var response = await _client.GetAsync(resourcePath + orderId);
             if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
             var order = await response.Content.ReadAsAsync<dynamic>();
@@ -115,12 +82,12 @@ namespace Coingate.Net
         public async Task<dynamic> CreateOrder(Order dto, string resourcePath = "/v2/orders/")
         {
             _client.BaseAddress = new Uri(_baseUri);
-            ConfigureHeaders(Signature());
+            ConfigureHeaders();
             var body = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("order_id", dto.OrderId.ToString()),
-                new KeyValuePair<string, string>("price", dto.Price.ToString()),
-                new KeyValuePair<string, string>("currency", dto.Currency),
+                new KeyValuePair<string, string>("price_amount", dto.Price.ToString()),
+                new KeyValuePair<string, string>("price_currency", dto.Currency),
                 new KeyValuePair<string, string>("receive_currency", dto.ReceiveCurrency),
                 new KeyValuePair<string, string>("title", dto.Title),
                 new KeyValuePair<string, string>("description", dto.Description),
@@ -132,6 +99,23 @@ namespace Coingate.Net
             if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
             var order = await response.Content.ReadAsAsync<dynamic>();
             return order;
+        }
+        
+        /// <summary>
+        /// Checkout https://developer.coingate.com/docs/checkout
+        /// </summary>
+        /// <param name="id">The order id</param>
+        /// <param name="resourcePath"></param>
+        /// <returns></returns>
+        public async Task<dynamic> Checkout(int orderId)
+        {
+            _client.BaseAddress = new Uri(_baseUri);
+            ConfigureHeaders();
+            var resourcePath = $"/v2/orders/{orderId}/checkout";
+            var response = await _client.GetAsync(resourcePath + orderId);
+            if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
+            var order = await response.Content.ReadAsAsync<dynamic>();
+            return order;  
         }
     }
 }
