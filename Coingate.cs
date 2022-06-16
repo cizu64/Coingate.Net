@@ -1,11 +1,7 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace Coingate.Net
 {
     public class Coingate
@@ -26,18 +22,10 @@ namespace Coingate.Net
             ApiToken = apiToken;
             _baseUri = useSandbox ? "https://api-sandbox.coingate.com/" : "https://api.coingate.com/";
             _client = new HttpClient();
-        }
-     
-        /// <summary>
-        /// Add the required headers needed for coingate auth
-        /// </summary>
-        /// <param name="signature"></param>
-        private void ConfigureHeaders()
-        {
-            _client.DefaultRequestHeaders.Add("Authorization", "Token " + ApiToken);      
+            _client.DefaultRequestHeaders.Add("Authorization", "Token " + ApiToken);
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
-
+      
         /// <summary>
         /// Get all orders https://developer.coingate.com/docs/list-orders
         /// </summary>
@@ -46,14 +34,13 @@ namespace Coingate.Net
         /// <param name="pageSize"></param>
         /// <param name="sort"></param>
         /// <returns></returns>
-        public async Task<dynamic> GetOrders(string resourcePath = "/v2/orders/", int pageNo = 1, int pageSize = 10, string sort = "created_at_desc")
+        public async Task<string> GetOrders(string resourcePath = "/v2/orders/", int pageNo = 1, int pageSize = 10, string sort = "created_at_desc")
         {
             _client.BaseAddress = new Uri(_baseUri);
-             ConfigureHeaders();
             string url = resourcePath + "?per_page=" + pageNo + "&page=" + pageSize + "&sort=" + sort;
             var response = await _client.GetAsync(url);
-            if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
-            var orders = await response.Content.ReadAsAsync<dynamic>();
+            if (!response.IsSuccessStatusCode) return "";
+            var orders = await response.Content.ReadAsStringAsync();
             return orders;
         }
 
@@ -63,13 +50,12 @@ namespace Coingate.Net
         /// <param name="orderId">The order id</param>
         /// <param name="resourcePath"></param>
         /// <returns></returns>
-        public async Task<dynamic> GetOrder(int orderId, string resourcePath = "/v2/orders/")
+        public async Task<string> GetOrder(int orderId, string resourcePath = "/v2/orders/")
         {
             _client.BaseAddress = new Uri(_baseUri);
-            ConfigureHeaders();
             var response = await _client.GetAsync(resourcePath + orderId);
-            if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
-            var order = await response.Content.ReadAsAsync<dynamic>();
+            if (!response.IsSuccessStatusCode) return "";
+            var order = await response.Content.ReadAsStringAsync();
             return order;  
         }
 
@@ -82,7 +68,6 @@ namespace Coingate.Net
         public async Task<dynamic> CreateOrder(Order dto, string resourcePath = "/v2/orders/")
         {
             _client.BaseAddress = new Uri(_baseUri);
-            ConfigureHeaders();
             var body = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("order_id", dto.OrderId.ToString()),
@@ -97,24 +82,29 @@ namespace Coingate.Net
             });
             var response = await _client.PostAsync(resourcePath, body);
             if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
-            var order = await response.Content.ReadAsAsync<dynamic>();
+            var order = await response.Content.ReadAsStringAsync();
             return order;
         }
-        
+
         /// <summary>
         /// Checkout https://developer.coingate.com/docs/checkout
         /// </summary>
         /// <param name="id">The order id</param>
         /// <param name="resourcePath"></param>
         /// <returns></returns>
-        public async Task<dynamic> Checkout(int orderId)
+        public async Task<string> Checkout(int orderId, string paycurrency)
         {
             _client.BaseAddress = new Uri(_baseUri);
-            ConfigureHeaders();
             var resourcePath = $"/v2/orders/{orderId}/checkout";
-            var response = await _client.GetAsync(resourcePath + orderId);
-            if (!response.IsSuccessStatusCode) return HttpStatusCode.BadRequest;
-            var order = await response.Content.ReadAsAsync<dynamic>();
+            var content = new Dictionary<string, string>
+            {
+                { "pay_currency", paycurrency }
+            };
+            var serilaize = JsonConvert.SerializeObject(content);
+            var body = new StringContent(serilaize);
+            var response = await _client.PostAsync(resourcePath, body);
+            if (!response.IsSuccessStatusCode) return "";
+            var order = await response.Content.ReadAsStringAsync();
             return order;  
         }
     }

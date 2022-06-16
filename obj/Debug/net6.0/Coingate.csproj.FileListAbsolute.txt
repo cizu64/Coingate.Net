@@ -1,0 +1,5 @@
+C:\Users\User\source\repos\Coingate\Coingate\obj\Debug\net6.0\Coingate.csproj.AssemblyReference.cache
+C:\Users\User\source\repos\Coingate\Coingate\obj\Debug\net6.0\Coingate.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\source\repos\Coingate\Coingate\obj\Debug\net6.0\Coingate.AssemblyInfoInputs.cache
+C:\Users\User\source\repos\Coingate\Coingate\obj\Debug\net6.0\Coingate.AssemblyInfo.cs
+C:\Users\User\source\repos\Coingate\Coingate\obj\Debug\net6.0\Coingate.csproj.CoreCompileInputs.cache
