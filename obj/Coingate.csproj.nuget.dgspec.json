@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\source\\repos\\Coingate\\Coingate\\Coingate.csproj": {}
+    "C:\\Users\\User\\source\\repos\\Coingate.Net\\Coingate.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\source\\repos\\Coingate\\Coingate\\Coingate.csproj": {
+    "C:\\Users\\User\\source\\repos\\Coingate.Net\\Coingate.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\source\\repos\\Coingate\\Coingate\\Coingate.csproj",
+        "projectUniqueName": "C:\\Users\\User\\source\\repos\\Coingate.Net\\Coingate.csproj",
         "projectName": "Coingate",
-        "projectPath": "C:\\Users\\User\\source\\repos\\Coingate\\Coingate\\Coingate.csproj",
+        "projectPath": "C:\\Users\\User\\source\\repos\\Coingate.Net\\Coingate.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\source\\repos\\Coingate\\Coingate\\obj\\",
+        "outputPath": "C:\\Users\\User\\source\\repos\\Coingate.Net\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\",
