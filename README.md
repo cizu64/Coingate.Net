@@ -32,7 +32,7 @@ Signature - It is a HMAC-SHA256 encoded message containing: nonce, app ID and AP
 # Creating an Order
 
 ```
-          var cg = new Coingate.Net.Coingate("apiKey","apiSecret","appId");
+          var cg = new Coingate.Net.Coingate("token");
             var orders = cg.CreateOrder(new Order
             {
                 Price = 100,
@@ -44,7 +44,7 @@ Signature - It is a HMAC-SHA256 encoded message containing: nonce, app ID and AP
 # Retrieving an Order
 
 ```
-          var cg = new Coingate.Net.Coingate("apiKey","apiSecret","appId");
+          var cg = new Coingate.Net.Coingate("token");
           var orders = cg.GetOrders();
           ...
 ```
